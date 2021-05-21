@@ -13,9 +13,9 @@ def k_nearest(X, k, obj, r):
     if(r == 1):
         d = [Evklid(normal_obj, i) for i in normal_X]
     if(r == 2):
-        d = [Evklid(normal_obj, i) for i in normal_X]
-    if(r == 3):
         d = [Hemming(normal_obj, i) for i in normal_X]
+    if(r == 3):
+        d = [Minkowski(normal_obj, i) for i in normal_X]
 
     nb = np.argsort(d)
 
@@ -34,4 +34,4 @@ def Hemming(p1, p2):
 def Minkowski(p1, p2):
     p = 2
     r = 2
-    return sum(abs(p1-p2)^p)^(1/r)
+    return sum(abs(p1-p2)**p)**(1/r)
