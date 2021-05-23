@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-def k_nearest(X, k, obj, r):
+def k_nearest(X, k, obj, dist_func):
     sub_X = X[:, 0:-1]
     mean = np.mean(sub_X, axis=0)
     std = np.std(sub_X, axis=0)
@@ -10,12 +10,7 @@ def k_nearest(X, k, obj, r):
 
     normal_obj = (obj - mean) / std
 
-    if(r == 1):
-        d = [Evklid(normal_obj, i) for i in normal_X]
-    if(r == 2):
-        d = [Hemming(normal_obj, i) for i in normal_X]
-    if(r == 3):
-        d = [Minkowski(normal_obj, i) for i in normal_X]
+    d = [dist_func(normal_obj, i) for i in normal_X]
 
     nb = np.argsort(d)
 

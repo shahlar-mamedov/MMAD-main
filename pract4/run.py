@@ -1,5 +1,5 @@
 import numpy as np
-from kNN import k_nearest
+from kNN import Evklid, Hemming, Minkowski, k_nearest
 
 X = np.array([[33, 21, 1],
 			  [41, 13, 1],
@@ -24,13 +24,13 @@ weight = int(input("Введите вес особи: "))
 obj = np.array([height, weight])
 
 k = 3
-object_class = k_nearest(X, k, obj, 1)
+object_class = k_nearest(X, k, obj, Evklid)
 
 monkeys = {1: 'lemur', 2: 'schimpanze', 3: 'gorilla', 4: 'orangutan'}
 print("Через евклидово расстояние:", monkeys[object_class])
 
-object_class = k_nearest(X, k, obj, 2)
+object_class = k_nearest(X, k, obj, Hemming)
 print("Через расстояние городских кварталов:", monkeys[object_class])
 
-object_class = k_nearest(X, k, obj, 3)
+object_class = k_nearest(X, k, obj, Minkowski)
 print("Через расстояние Минковского:", monkeys[object_class])
