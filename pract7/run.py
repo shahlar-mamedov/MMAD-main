@@ -1,24 +1,18 @@
 from bs4 import BeautifulSoup as bs
 import requests as rq
 
-
-url = 'https://habr.com/ru/post/509082/'
-url = rq.get(url)
+url = rq.get('https://habr.com/ru/post/509082/')
 doc = bs(url.text, 'html.parser')
-
 
 name = doc.select(".post__title-text")[0].decode_contents().strip()
 author = doc.select('.user-info__fullname')[0].decode_contents().strip()
 date = doc.select('.post__time')[0].decode_contents().strip()
 viws = doc.select('.post-stats__views-count')[0].decode_contents().strip()
 
-
-
 print('Название статьи:', name)
 print('Автор:', author)
 print('Дата публикации:', date)
 print('Кол-во просмотров:', viws)
-
 
 comments = []
 for node in doc.select('.comment'):
@@ -26,7 +20,6 @@ for node in doc.select('.comment'):
     author = node.select('.user-info__nickname_comment')[0].decode_contents().strip()
     votes = node.select('span.voting-wjt__counter')[0].decode_contents().strip()
     comments.append({'author': author, 'text': text, 'votes' : votes})
-
 
 print('\nКомментариев в статье:', len(comments))
 print('\nСамый маленький комментарий:', sorted(comments, key=lambda x: len(x['text']))[0]['text'])
