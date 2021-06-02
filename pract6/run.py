@@ -3,45 +3,48 @@ import numpy as np
 from sklearn import linear_model
 import matplotlib.pyplot as plt
 
-im = Image.open('image.jpg')
 
-data = np.array(im.getdata()).reshape([im.height, im.width, 3])
+def compression(src, result, pn, bit):
+    im = Image.open(src)
 
-x = np.arange(0, im.width)
-X = np.array([x, x**2.0, x**3.0, x**4.0, x**5.0]).transpose()
+    data = np.array(im.getdata()).reshape([im.height, im.width, 3])
 
-plt.title('Цветовые каналы первой строки изображения')
-plt.plot(data[0, :, 0], 'r-')
-plt.plot(data[0, :, 1], 'g-')
-plt.plot(data[0, :, 2], 'b-')
-plt.grid()
-plt.show()
+    x = np.arange(0, im.width)
 
-y = data[0, :, 0]
-lm = linear_model.LinearRegression()
-lm.fit(X, y)
-predicted = lm.predict(X)
+    X = np.array([x**i for i in np.arange(pn)]).transpose()
 
-plt.title('Описание строки изображения с помощью полинома 5 степени')
-plt.plot(predicted, 'b--')
-plt.plot(y, 'b-')
-plt.grid()
-plt.show()
+    plt.title('Цветовые каналы первой строки изображения')
+    plt.plot(data[0, :, 0], 'r-')
+    plt.plot(data[0, :, 1], 'g-')
+    plt.plot(data[0, :, 2], 'b-')
+    plt.grid()
+    plt.show()
 
-diff = y - predicted
+    y = data[0, :, 0]
+    lm = linear_model.LinearRegression()
+    lm.fit(X, y)
+    predicted = lm.predict(X)
 
-bits_per_channel = int(input("Bits: "))
+    plt.title('Описание строки изображения с помощью полинома ' + str(pn) + ' степени')
+    plt.plot(predicted, 'b--')
+    plt.plot(y, 'b-')
+    plt.grid()
+    plt.show()
 
-threshold = 2**(bits_per_channel-1)-1
+    diff = y - predicted
 
-diff = np.clip(diff, -threshold, threshold)
+    bits_per_channel = bit
 
-y = predicted + diff
-y = np.clip(np.round(y), 0, 255)
+    threshold = 2**(bits_per_channel-1)-1
 
-mas = [[0]*3 for i in range(im.height)]
-for i in range(im.height):
-    for j in range(3):
+    diff = np.clip(diff, -threshold, threshold)
+
+    y = predicted + diff
+    y = np.clip(np.round(y), 0, 255)
+
+    mas = [[0]*3 for i in range(im.height)]
+    for i in range(im.height):
+        for j in range(3):
             y = data[i, :, j]
             lm = linear_model.LinearRegression()
             lm.fit(X, y)
@@ -52,12 +55,18 @@ for i in range(im.height):
             y = np.clip(np.round(y), 0, 255)
             mas[i][j] = y.astype(int)
 
-pix = im.load()
-for i in range(im.height):
-    for j in range(im.width):
-        for k in range(3):
-            l = list(pix[j, i])
-            l[k] = mas[i][k][j]
-            pix[j, i] = tuple(l)
+    pix = im.load()
+    for i in range(im.height):
+        for j in range(im.width):
+            for k in range(3):
+                l = list(pix[j, i])
+                l[k] = mas[i][k][j]
+                pix[j, i] = tuple(l)
 
-im.save('compression_' + str(bits_per_channel) + '_bits' + '.jpg')
+    im.save(result)
+    return "Готово"
+
+bits = int(input("Bits: "))
+result = 'compression_' + str(bits) + '_bits' + '.jpg'
+
+print(compression('image.jpg', result , 5.0, bits))
